@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package se.kth.id1212.nphomework1.server;
+package se.kth.id1212.nphomework1.server.controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
