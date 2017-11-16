@@ -69,16 +69,34 @@ public class InputHandler implements Runnable{
                         clientController.disconnect();
                         break;
                     case START_GAME:
-                        System.out.println("Starting game- type 'guess' followed by a letter or word");
-                        clientController.startGame();
+                        if(clientController.checkConnected()){
+                            System.out.println("Starting game- type 'guess' followed by a letter or word");
+                            clientController.startGame();
+                        }
+                        else{
+                            System.out.println("Not connected");
+                            System.out.print("> ");
+                        }
                         break;
                     case GUESS_LETTER:
-                        System.out.println("Guessing letter " + rest);
-                        clientController.guessLetter(rest);
+                        if(clientController.checkConnected()){
+                            System.out.println("Guessing letter " + rest);
+                            clientController.guessLetter(rest);
+                        }
+                        else{
+                            System.out.println("Not connected");
+                            System.out.print("> ");
+                        }
                         break;
                     case GUESS_WORD:
-                        System.out.println("Guessing word");
-                        clientController.guessWord(rest);
+                        if(clientController.checkConnected()){
+                            System.out.println("Guessing word");
+                            clientController.guessWord(rest);
+                        }
+                        else{
+                            System.out.println("Not connected");
+                            System.out.print("> ");
+                        }
                         break;
                     case UNKNOWN:
                         System.out.println("Invalid command");

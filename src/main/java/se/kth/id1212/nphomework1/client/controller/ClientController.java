@@ -94,7 +94,7 @@ public class ClientController {
         }
     }
     
-    public void sendToPrint(String input){
+    private void sendToPrint(String input){
         int i = input.indexOf(',');
         if(i < 0){
             toOutput.printLn(input);
@@ -135,6 +135,10 @@ public class ClientController {
         }
     }
     
+    public boolean checkConnected(){
+        return connected;
+    }
+    
     private class Listener implements Runnable {
         //private final OutputHandler outputHandler;
 
@@ -153,7 +157,7 @@ public class ClientController {
                 }
             } catch (IOException connectionFailure) {
                 if (connected) {
-                    System.out.println("Lost connection.");
+                    sendToPrint("Lost connection.");
                 }
             }
         }
