@@ -79,7 +79,6 @@ public class ServerController {
     ClientHandler(ServerController server, Socket clientSocket) {
         this.server = server;
         this.clientSocket = clientSocket;
-        //this.conversationWhenStarting = conversation;
         connected = true;
         this.player = new Player();
         this.guessedCorrect = false;
