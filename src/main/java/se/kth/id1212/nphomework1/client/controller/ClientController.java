@@ -36,14 +36,10 @@ public class ClientController {
         connected = true;
         boolean autoFlush = true;
         toServer = new PrintWriter(socket.getOutputStream(), autoFlush);
-        //toServer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         new Thread(new Listener()).start();
         toOutput = new OutputHandler();
-        toServer.println("connect");
-        //toServer.newLine();
-        //toServer.flush();
-        
+        toServer.println("connect");  
     }
     
     public void startGame(){
@@ -140,11 +136,6 @@ public class ClientController {
     }
     
     private class Listener implements Runnable {
-        //private final OutputHandler outputHandler;
-
-        /*private Listener(OutputHandler outputHandler) {
-            this.outputHandler = outputHandler;
-        }*/
 
         @Override
         public void run() {

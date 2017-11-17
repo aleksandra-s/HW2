@@ -63,6 +63,7 @@ public class InputHandler implements Runnable{
                         String port = rest.substring(j + 1);
                         clientController.connect(address,Integer.parseInt(port));
                         System.out.println("Connecting " + address + " " + port);
+                        System.out.print("> ");
                         break;
                     case DISCONNECT:
                         System.out.println("Sending disconnect command");
@@ -72,6 +73,7 @@ public class InputHandler implements Runnable{
                         if(clientController.checkConnected()){
                             System.out.println("Starting game- type 'guess' followed by a letter or word");
                             clientController.startGame();
+                            System.out.print("> ");
                         }
                         else{
                             System.out.println("Not connected");
@@ -82,6 +84,7 @@ public class InputHandler implements Runnable{
                         if(clientController.checkConnected()){
                             System.out.println("Guessing letter " + rest);
                             clientController.guessLetter(rest);
+                            System.out.print("> ");
                         }
                         else{
                             System.out.println("Not connected");
@@ -92,6 +95,7 @@ public class InputHandler implements Runnable{
                         if(clientController.checkConnected()){
                             System.out.println("Guessing word");
                             clientController.guessWord(rest);
+                            System.out.print("> ");
                         }
                         else{
                             System.out.println("Not connected");
