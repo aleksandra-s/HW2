@@ -21,6 +21,7 @@ public class InputHandler implements Runnable{
     String rest;
     ClientController clientController;
     
+    //Start thread for run method
     public void start(){
         if(receivingCmds){
             return;
@@ -30,9 +31,10 @@ public class InputHandler implements Runnable{
         clientController = new ClientController();
     }
     
+    //run method processes input from user
     @Override
     public void run(){  
-        System.out.println("Welcome to Hangman. Type 'connect <address> <port>' to connect, then 'start' to start playing");
+        System.out.println("Welcome to Hangman. Type 'connect <address> 8080' to connect, then 'start' to start playing");
         System.out.print("> ");
         while(receivingCmds){
             try{
@@ -115,6 +117,7 @@ public class InputHandler implements Runnable{
         }
     }
     
+    //Determine Command based on input from user
     private Command getCommand(String command, String rest){
         Command returnCommand;
         if(command.equals("connect")){

@@ -32,6 +32,7 @@ public class ServerController {
      * @param args Takes one command line argument, the number of the port on which the server will
      *             listen, the default is <code>8080</code>.
      */
+    //Run server
     public static void main(String[] args) {
         ServerController server = new ServerController();
         server.serve();
@@ -40,7 +41,6 @@ public class ServerController {
     private void serve() {
         try {
             ServerSocket listeningSocket = new ServerSocket(portNo);
-            //System.out.println("In serve");
             while (true) {
                 Socket clientSocket = listeningSocket.accept();
                 startHandler(clientSocket);
@@ -55,7 +55,7 @@ public class ServerController {
         clientSocket.setSoTimeout(TIMEOUT_HALF_HOUR);
         ClientHandler handler = new ClientHandler(this, clientSocket);
         Thread handlerThread = new Thread(handler);
-        handlerThread.setPriority(Thread.MAX_PRIORITY); //NOT SURE ABOUT THIS
+        handlerThread.setPriority(Thread.MAX_PRIORITY); 
         handlerThread.start();
     }
     

@@ -23,12 +23,12 @@ public class ClientController {
     private static final int TIMEOUT_HALF_HOUR = 1800000;
     private static final int TIMEOUT_HALF_MINUTE = 30000;
     private Socket socket;
-    //private PrintWriter toServer;
     private PrintWriter toServer;
     private BufferedReader fromServer;
     private volatile boolean connected;
     private OutputHandler toOutput;
     
+    //Connect to server
     public void connect(String ipAddress, int port)throws IOException {
         socket = new Socket();
         socket.connect(new InetSocketAddress(ipAddress, port), TIMEOUT_HALF_MINUTE);
@@ -42,6 +42,7 @@ public class ClientController {
         toServer.println("connect");  
     }
     
+    //Send start game command to server and ask for info to print
     public void startGame(){
         if(connected){
             toServer.println("start");
@@ -53,6 +54,7 @@ public class ClientController {
         }
     }
     
+     //Send guess letter command to server and ask for info to print
     public void guessLetter(String letter){
         if(connected){
             toServer.println("guess " + letter);
@@ -64,6 +66,7 @@ public class ClientController {
         }
     }
     
+     //Send guess word command to server and ask for info to print
     public void guessWord(String word){
         if(connected){
             toServer.println("guess " + word);
@@ -75,6 +78,7 @@ public class ClientController {
         }
     }
     
+     //Send disconnect command to server and shut down connection on client side
     public void disconnect() throws IOException{
         if(connected){
             toServer.println("disconnect");
@@ -90,6 +94,7 @@ public class ClientController {
         }
     }
     
+    //Send information to OutputHandler to be printed to user
     private void sendToPrint(String input){
         int i = input.indexOf(',');
         if(i < 0){
@@ -126,7 +131,6 @@ public class ClientController {
                 toOutput.printWord(guessWord);
                 toOutput.printAttempts(attempts);
                 toOutput.print("> ");
-                //toOutput.print("Guess again");
             }
         }
     }
@@ -135,6 +139,7 @@ public class ClientController {
         return connected;
     }
     
+    //Listener subclass waits on message from server
     private class Listener implements Runnable {
 
         @Override
@@ -143,7 +148,6 @@ public class ClientController {
                 for (;;) {
                     String input = fromServer.readLine();
                     sendToPrint(input);
-                    //System.out.println(input);
                     
                 }
             } catch (IOException connectionFailure) {

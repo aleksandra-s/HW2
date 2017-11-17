@@ -30,6 +30,7 @@ public class Player {
         this.stillPlaying = false;
     }
     
+    //Start new game
     public String getNewWord(){
         String returnWord;
         try {
@@ -68,6 +69,7 @@ public class Player {
         return this.stillPlaying;
     }
     
+    //Update client game data based on whether guess is correct
     public boolean guessWord(String guess){
         if(guess.equals(this.wordToGuess)){
             this.wordToPrint = this.wordToGuess;
@@ -87,6 +89,7 @@ public class Player {
         }
     }
     
+    //Update client game data based on whether guess is correct
     public boolean guessLetter(char guess){
         boolean returnResult = false;
         for(int i = 0; i < this.wordToGuess.length(); i++){
