@@ -86,6 +86,11 @@ public class ServerConnection implements Runnable {
         }
     }
     
+    public void connect(String host, int port) {
+        serverAddress = new InetSocketAddress(host, port);
+        new Thread(this).start();
+    }
+    
      public void disconnect() throws IOException {
         connected = false;
         //sendMsg(MsgType.DISCONNECT.toString(), null);
@@ -135,7 +140,28 @@ public class ServerConnection implements Runnable {
         }
     }
     
-    private void recvFromServer(SelectionKey key){
-        //have to figure out how to implement this best
+    private void recvFromServer(SelectionKey key) throws IOException {
+        msgFromServer.clear();
+        int numOfReadBytes = socketChannel.read(msgFromServer);
+        if (numOfReadBytes == -1) {
+            throw new IOException(FATAL_COMMUNICATION_MSG);
+        }
+        String recvdString = extractMessageFromBuffer();
+        System.out.println("Received: " + recvdString);
+        /*msgSplitter.appendRecvdString(recvdString);
+        while (msgSplitter.hasNext()) {
+            String msg = msgSplitter.nextMsg();
+            if (MessageSplitter.typeOf(msg) != MsgType.BROADCAST) {
+                throw new MessageException("Received corrupt message: " + msg);
+            }
+            notifyMsgReceived(MessageSplitter.bodyOf(msg));
+        }*/
+    }
+    
+     private String extractMessageFromBuffer() {
+        msgFromServer.flip();
+        byte[] bytes = new byte[msgFromServer.remaining()];
+        msgFromServer.get(bytes);
+        return new String(bytes);
     }
 }

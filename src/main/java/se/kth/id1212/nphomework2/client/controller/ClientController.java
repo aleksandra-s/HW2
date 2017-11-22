@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import se.kth.id1212.nphomework1.client.view.OutputHandler;
+import se.kth.id1212.nphomework2.client.net.ServerConnection;
 
 /**
  *
@@ -27,10 +28,10 @@ public class ClientController {
     private BufferedReader fromServer;
     private volatile boolean connected;
     private OutputHandler toOutput;
-    
+    private ServerConnection serverConnect;
     //Connect to server
     public void connect(String ipAddress, int port)throws IOException {
-        socket = new Socket();
+        /*socket = new Socket();
         socket.connect(new InetSocketAddress(ipAddress, port), TIMEOUT_HALF_MINUTE);
         socket.setSoTimeout(TIMEOUT_HALF_HOUR);
         connected = true;
@@ -39,7 +40,8 @@ public class ClientController {
         fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         new Thread(new Listener()).start();
         toOutput = new OutputHandler();
-        toServer.println("connect");  
+        toServer.println("connect");  */
+        serverConnect.connect(ipAddress, port);
     }
     
     //Send start game command to server and ask for info to print

@@ -33,11 +33,11 @@ public class ServerController {
      *             listen, the default is <code>8080</code>.
      */
     //Run server
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         ServerController server = new ServerController();
         server.serve();
     }
-    
+    */
     private void serve() {
         try {
             ServerSocket listeningSocket = new ServerSocket(portNo);
