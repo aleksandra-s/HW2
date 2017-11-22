@@ -79,7 +79,7 @@ public class ClientConnection {
                     } else if (key.isReadable()) {
                         recvFromClient(key);
                     } else if (key.isWritable()) {
-                        //sendToClient(key);
+                        sendToClient(key);
                     }
                 }
             }
@@ -110,18 +110,18 @@ public class ClientConnection {
             removeClient(key);
         }
     }
-/*
+
     private void sendToClient(SelectionKey key) throws IOException {
         Client client = (Client) key.attachment();
         try {
             client.sendAll();
             key.interestOps(SelectionKey.OP_READ);
-        } catch (MessageException couldNotSendAllMessages) {
+        //} catch (MessageException couldNotSendAllMessages) {
         } catch (IOException clientHasClosedConnection) {
             removeClient(key);
         }
     }
-*/
+
     private void removeClient(SelectionKey clientKey) throws IOException {
         Client client = (Client) clientKey.attachment();
         client.handler.disconnectClient();
@@ -181,8 +181,8 @@ public class ClientConnection {
                 messagesToSend.add(msg.duplicate());
             }
         }
-/*
-        private void sendAll() throws IOException, MessageException {
+
+        private void sendAll() throws IOException {
             ByteBuffer msg = null;
             synchronized (messagesToSend) {
                 while ((msg = messagesToSend.peek()) != null) {
@@ -190,7 +190,7 @@ public class ClientConnection {
                     messagesToSend.remove();
                 }
             }
-        }*/
+        }
     }
 
     /**

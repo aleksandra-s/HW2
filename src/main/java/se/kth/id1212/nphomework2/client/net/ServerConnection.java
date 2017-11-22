@@ -164,4 +164,19 @@ public class ServerConnection implements Runnable {
         msgFromServer.get(bytes);
         return new String(bytes);
     }
+     
+     public void sendMsg(String message) {
+        /*StringJoiner joiner = new StringJoiner(Constants.MSG_TYPE_DELIMETER);
+        for (String part : parts) {
+            joiner.add(part);
+        }
+        String messageWithLengthHeader = MessageSplitter.prependLengthHeader(joiner.toString());*/
+        
+        synchronized (messagesToSend) {
+            messagesToSend.add(ByteBuffer.wrap(message.getBytes()));
+        }
+        timeToSend = true;
+        selector.wakeup();
+    }
+
 }

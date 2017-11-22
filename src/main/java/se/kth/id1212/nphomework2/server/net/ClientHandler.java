@@ -93,7 +93,8 @@ class ClientHandler implements Runnable {
         }
         String recvdString = extractMessageFromBuffer();
         //msgSplitter.appendRecvdString(recvdString);
-        ForkJoinPool.commonPool().execute(this);
+        //ForkJoinPool.commonPool().execute(this);
+        System.out.println(recvdString);
     }
 
     private String extractMessageFromBuffer() {

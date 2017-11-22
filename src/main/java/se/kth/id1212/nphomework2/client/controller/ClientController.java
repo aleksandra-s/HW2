@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import se.kth.id1212.nphomework1.client.view.OutputHandler;
+import se.kth.id1212.nphomework2.client.view.OutputHandler;
 import se.kth.id1212.nphomework2.client.net.ServerConnection;
 
 /**
@@ -41,19 +41,21 @@ public class ClientController {
         new Thread(new Listener()).start();
         toOutput = new OutputHandler();
         toServer.println("connect");  */
+        serverConnect = new ServerConnection();
         serverConnect.connect(ipAddress, port);
     }
     
     //Send start game command to server and ask for info to print
     public void startGame(){
-        if(connected){
+        /*if(connected){
             toServer.println("start");
             toServer.println("info");
         }
         else{
             toOutput.printLn("Not connected, type connect <address> <port> to connect");
             toOutput.print("> ");
-        }
+        }*/
+        serverConnect.sendMsg("start a 127");
     }
     
      //Send guess letter command to server and ask for info to print

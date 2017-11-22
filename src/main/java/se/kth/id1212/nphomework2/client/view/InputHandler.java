@@ -7,8 +7,8 @@ package se.kth.id1212.nphomework2.client.view;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import se.kth.id1212.nphomework1.client.controller.ClientController;
-import se.kth.id1212.nphomework1.common.Commands.Command;
+import se.kth.id1212.nphomework2.client.controller.ClientController;
+import se.kth.id1212.nphomework2.common.Commands.Command;
 /**
  *
  * @author aleks_uuia3ly
@@ -72,15 +72,15 @@ public class InputHandler implements Runnable{
                         clientController.disconnect();
                         break;
                     case START_GAME:
-                        if(clientController.checkConnected()){
+                        //if(clientController.checkConnected()){
                             System.out.println("Starting game- type 'guess' followed by a letter or word");
                             clientController.startGame();
                             System.out.print("> ");
-                        }
-                        else{
+                        //}
+                        /*else{
                             System.out.println("Not connected");
                             System.out.print("> ");
-                        }
+                        }*/
                         break;
                     case GUESS_LETTER:
                         if(clientController.checkConnected()){
