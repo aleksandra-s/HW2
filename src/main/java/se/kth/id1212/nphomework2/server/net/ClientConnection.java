@@ -27,6 +27,7 @@ public class ClientConnection {
     private static final int TIMEOUT_HALF_HOUR = 1800000;
     private final ServerController contr = new ServerController();
     private final Queue<ByteBuffer> messagesToSend = new ArrayDeque<>();
+    private ByteBuffer messageToClient = ByteBuffer.allocateDirect(8152);
     private int portNo = 8080;
     private Selector selector;
     private ServerSocketChannel listeningSocketChannel;
@@ -40,20 +41,21 @@ public class ClientConnection {
     void broadcast(String msg) {
         //contr.appendEntry(msg);
         timeToBroadcast = true;
-        ByteBuffer completeMsg = createBroadcastMessage(msg);
-        synchronized (messagesToSend) {
+        //ByteBuffer completeMsg = createBroadcastMessage(msg);
+        /*synchronized (messagesToSend) {
             messagesToSend.add(completeMsg);
-        }
-        selector.wakeup();
+        }*/
+        //messageToClient.put(completeMsg);
+        //handler.sendMsg(completeMsg);
+        //selector.wakeup();
     }
 
     private ByteBuffer createBroadcastMessage(String msg) {
         /*StringJoiner joiner = new StringJoiner(Constants.MSG_TYPE_DELIMETER);
         joiner.add(MsgType.BROADCAST.toString());
         joiner.add(msg);
-        String messageWithLengthHeader = MessageSplitter.prependLengthHeader(joiner.toString());
-        return ByteBuffer.wrap(messageWithLengthHeader.getBytes());*/
-        return null;
+        String messageWithLengthHeader = MessageSplitter.prependLengthHeader(joiner.toString());*/
+        return ByteBuffer.wrap(msg.getBytes());
     }
 
     private void serve() {
@@ -61,16 +63,23 @@ public class ClientConnection {
             initSelector();
             initListeningSocketChannel();
             while (true) {
-                if (timeToBroadcast) {
-                    writeOperationForAllActiveClients();
-                    appendMsgToAllClientQueues();
+                /*if (timeToBroadcast) {
+                    //writeOperationForAllActiveClients();
+                    //appendMsgToClientQueue();
+                    
                     timeToBroadcast = false;
-                }
+                }*/
                 selector.select();
                 Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                 while (iterator.hasNext()) {
                     SelectionKey key = iterator.next();
                     iterator.remove();
+                    if(timeToBroadcast){
+                        /*Client client = (Client) key.attachment();
+                        client.setToWrite();
+                        timeToBroadcast = false;*/
+                        //key.interestOps(SelectionKey.OP_WRITE);
+                    }
                     if (!key.isValid()) {
                         continue;
                     }
@@ -78,7 +87,9 @@ public class ClientConnection {
                         startHandler(key);
                     } else if (key.isReadable()) {
                         recvFromClient(key);
-                    } else if (key.isWritable()) {
+                    }else if (key.isWritable()) {
+                       // Client client = (Client) key.attachment();
+                        //client.queueMsgToSend(msg);
                         sendToClient(key);
                     }
                 }
@@ -93,7 +104,7 @@ public class ClientConnection {
         SocketChannel clientChannel = serverSocketChannel.accept();
         clientChannel.configureBlocking(false);
         ClientHandler handler = new ClientHandler(this, clientChannel);
-        clientChannel.register(selector, SelectionKey.OP_WRITE, new Client(handler));
+        clientChannel.register(selector, SelectionKey.OP_WRITE, new Client(handler, key));
         clientChannel.setOption(StandardSocketOptions.SO_LINGER, LINGER_TIME); //Close will probably
         //block on some JVMs.
         System.out.println("Connected");
@@ -146,12 +157,12 @@ public class ClientConnection {
             }
         }
     }
-
-    private void appendMsgToAllClientQueues() {
+/*
+    private void appendMsgToClientQueue(SelectionKey key) {
         synchronized (messagesToSend) {
             ByteBuffer msgToSend;
             while ((msgToSend = messagesToSend.poll()) != null) {
-                for (SelectionKey key : selector.keys()) {
+                //for (SelectionKey key : selector.keys()) {
                     Client client = (Client) key.attachment();
                     if (client == null) {
                         continue;
@@ -160,17 +171,19 @@ public class ClientConnection {
                         client.queueMsgToSend(msgToSend);
 
                     }
-                }
+                //}
             }
         }
-    }
+    }*/
 
     private class Client {
         private final ClientHandler handler;
         private final Queue<ByteBuffer> messagesToSend = new ArrayDeque<>();
+        //private final SelectionKey key;
 
-        private Client(ClientHandler handler) {
+        private Client(ClientHandler handler, SelectionKey key) {
             this.handler = handler;
+            //this.key = key;
             /*for (String entry : conversation) {
                 messagesToSend.add(createBroadcastMessage(entry));
             }*/
@@ -191,6 +204,10 @@ public class ClientConnection {
                 }
             }
         }
+        
+       /* private void setToWrite(){
+            this.key.interestOps(SelectionKey.OP_WRITE);
+        }*/
     }
 
     /**

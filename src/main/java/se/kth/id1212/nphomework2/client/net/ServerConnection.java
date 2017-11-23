@@ -70,8 +70,10 @@ public class ServerConnection implements Runnable {
                     if (key.isConnectable()) {
                         completeConnection(key);
                     } else if (key.isReadable()) {
+                        System.out.println("receiving from server");
                         recvFromServer(key);
                     } else if (key.isWritable()) {
+                        System.out.println("sending to server");
                         sendToServer(key);
                     }
                 }
@@ -125,6 +127,7 @@ public class ServerConnection implements Runnable {
                 }
                 messagesToSend.remove();
             }
+            System.out.println("Key to read");
             key.interestOps(SelectionKey.OP_READ);
         }
     }

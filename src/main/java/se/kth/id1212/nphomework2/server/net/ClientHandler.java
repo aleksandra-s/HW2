@@ -10,6 +10,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.StringJoiner;
 import java.util.concurrent.ForkJoinPool;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /*import se.kth.id1212.nio.textprotocolchat.common.Constants;
 import se.kth.id1212.nio.textprotocolchat.common.MessageException;
 import se.kth.id1212.nio.textprotocolchat.common.MessageSplitter;
@@ -62,7 +64,25 @@ class ClientHandler implements Runnable {
                     throw new MessageException("Received corrupt message: " + msg.receivedString);
             }
         }*/
-        
+        int i = 0;
+        if(i<1){
+            String message = "hello";
+            ByteBuffer buff = createBroadcastMessage(message);
+            try {
+                sendMsg(buff);
+            } catch (IOException ex) {
+                
+            }
+            i++;
+        }
+    }
+    
+    private ByteBuffer createBroadcastMessage(String msg) {
+        /*StringJoiner joiner = new StringJoiner(Constants.MSG_TYPE_DELIMETER);
+        joiner.add(MsgType.BROADCAST.toString());
+        joiner.add(msg);
+        String messageWithLengthHeader = MessageSplitter.prependLengthHeader(joiner.toString());*/
+        return ByteBuffer.wrap(msg.getBytes());
     }
 
     /**
@@ -72,6 +92,7 @@ class ClientHandler implements Runnable {
      * @throws IOException If failed to send message.
      */
     void sendMsg(ByteBuffer msg) throws IOException {
+      
         clientChannel.write(msg);
         if (msg.hasRemaining()) {
             //throw new MessageException("Could not send message");
@@ -93,8 +114,16 @@ class ClientHandler implements Runnable {
         }
         String recvdString = extractMessageFromBuffer();
         //msgSplitter.appendRecvdString(recvdString);
-        //ForkJoinPool.commonPool().execute(this);
+        //System.out.println(recvdString);
+        ForkJoinPool.commonPool().execute(this);
         System.out.println(recvdString);
+        String message = "hello";
+            ByteBuffer buff = createBroadcastMessage(message);
+            try {
+                sendMsg(buff);
+            } catch (IOException ex) {
+                
+       }
     }
 
     private String extractMessageFromBuffer() {
