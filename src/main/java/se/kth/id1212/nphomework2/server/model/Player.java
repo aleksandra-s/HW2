@@ -34,7 +34,7 @@ public class Player {
     public String getNewWord(){
         String returnWord;
         try {
-            returnWord = new se.kth.id1212.nphomework1.server.model.WordRetrieve().chooseWordFromFile();
+            returnWord = new se.kth.id1212.nphomework2.server.model.WordRetrieve().chooseWordFromFile();
             System.out.println("returned: " + returnWord);
             this.wordToGuess = returnWord;
             StringBuilder buildMask = new StringBuilder();
