@@ -7,6 +7,7 @@ package se.kth.id1212.nphomework2.server.net;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.StringJoiner;
 import java.util.concurrent.ForkJoinPool;
@@ -30,6 +31,7 @@ class ClientHandler implements Runnable {
     private final ByteBuffer msgFromClient = ByteBuffer.allocateDirect(8192);
     //private final MessageSplitter msgSplitter = new MessageSplitter();
     private String username = "anonymous";
+    private SelectionKey clientKey;
 
     /**
      * Creates a new instance, which will handle communication with one specific client connected to
@@ -40,6 +42,11 @@ class ClientHandler implements Runnable {
     ClientHandler(ClientConnection server, SocketChannel clientChannel) {
         this.server = server;
         this.clientChannel = clientChannel;
+        //this.clientKey = key;
+    }
+    
+    public void setKey(SelectionKey key){
+        this.clientKey = key;
     }
 
     /**
@@ -67,12 +74,13 @@ class ClientHandler implements Runnable {
         int i = 0;
         if(i<1){
             String message = "hello";
-            ByteBuffer buff = createBroadcastMessage(message);
+            /*ByteBuffer buff = createBroadcastMessage(message);
             try {
                 sendMsg(buff);
             } catch (IOException ex) {
                 
-            }
+            }*/
+            server.broadcast(message,clientKey);
             i++;
         }
     }
@@ -117,13 +125,13 @@ class ClientHandler implements Runnable {
         //System.out.println(recvdString);
         ForkJoinPool.commonPool().execute(this);
         System.out.println(recvdString);
-        String message = "hello";
+        /*String message = "hello";
             ByteBuffer buff = createBroadcastMessage(message);
             try {
                 sendMsg(buff);
             } catch (IOException ex) {
                 
-       }
+       }*/
     }
 
     private String extractMessageFromBuffer() {

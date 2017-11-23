@@ -26,7 +26,8 @@ public class ClientConnection {
     private static final int LINGER_TIME = 5000;
     private static final int TIMEOUT_HALF_HOUR = 1800000;
     private final ServerController contr = new ServerController();
-    private final Queue<ByteBuffer> messagesToSend = new ArrayDeque<>();
+    //private final Queue<ByteBuffer> messagesToSend = new ArrayDeque<>();
+    private final Queue<MsgAndKeyObject> messagesToSend = new ArrayDeque<>();
     private ByteBuffer messageToClient = ByteBuffer.allocateDirect(8152);
     private int portNo = 8080;
     private Selector selector;
@@ -38,16 +39,18 @@ public class ClientConnection {
      *
      * @param msg The message to broadcast.
      */
-    void broadcast(String msg) {
+    void broadcast(String msg, SelectionKey key) {
         //contr.appendEntry(msg);
-        timeToBroadcast = true;
-        //ByteBuffer completeMsg = createBroadcastMessage(msg);
-        /*synchronized (messagesToSend) {
-            messagesToSend.add(completeMsg);
-        }*/
+        //timeToBroadcast = true;
+        ByteBuffer completeMsg = createBroadcastMessage(msg);
+        MsgAndKeyObject putInQueue = new MsgAndKeyObject(completeMsg, key);
+        System.out.println("Message passed in to broadcast: " + msg + " key " + key);
+        synchronized (messagesToSend) {
+            messagesToSend.add(putInQueue);
+        }
         //messageToClient.put(completeMsg);
         //handler.sendMsg(completeMsg);
-        //selector.wakeup();
+        selector.wakeup();
     }
 
     private ByteBuffer createBroadcastMessage(String msg) {
@@ -63,23 +66,22 @@ public class ClientConnection {
             initSelector();
             initListeningSocketChannel();
             while (true) {
-                /*if (timeToBroadcast) {
-                    //writeOperationForAllActiveClients();
-                    //appendMsgToClientQueue();
-                    
-                    timeToBroadcast = false;
-                }*/
+                synchronized (messagesToSend) {
+                    MsgAndKeyObject queueObject;
+                    while ((queueObject = messagesToSend.poll()) != null) {
+                        System.out.println("key " + queueObject.getKey());
+                        Client client = (Client) queueObject.getKey().attachment();
+                        client.queueMsgToSend(queueObject.getMessage());
+                        queueObject.getKey().interestOps(SelectionKey.OP_WRITE);
+                    }
+                }
                 selector.select();
                 Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                 while (iterator.hasNext()) {
                     SelectionKey key = iterator.next();
+                    Client client = (Client) key.attachment();
+                    System.out.println("key in iterator " + key + " client in iterator " + client);
                     iterator.remove();
-                    if(timeToBroadcast){
-                        /*Client client = (Client) key.attachment();
-                        client.setToWrite();
-                        timeToBroadcast = false;*/
-                        //key.interestOps(SelectionKey.OP_WRITE);
-                    }
                     if (!key.isValid()) {
                         continue;
                     }
@@ -88,13 +90,12 @@ public class ClientConnection {
                     } else if (key.isReadable()) {
                         recvFromClient(key);
                     }else if (key.isWritable()) {
-                       // Client client = (Client) key.attachment();
-                        //client.queueMsgToSend(msg);
                         sendToClient(key);
                     }
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("Server failure.");
         }
     }
@@ -104,13 +105,11 @@ public class ClientConnection {
         SocketChannel clientChannel = serverSocketChannel.accept();
         clientChannel.configureBlocking(false);
         ClientHandler handler = new ClientHandler(this, clientChannel);
-        clientChannel.register(selector, SelectionKey.OP_WRITE, new Client(handler, key));
-        clientChannel.setOption(StandardSocketOptions.SO_LINGER, LINGER_TIME); //Close will probably
-        //block on some JVMs.
-        System.out.println("Connected");
-        // clientChannel.socket().setSoTimeout(TIMEOUT_HALF_HOUR); Timeout is not supported on 
-        // socket channels. Could be implemented using a separate timer that is checked whenever the
-        // select() method in the main loop returns.
+        Client client = new Client(handler);
+        SelectionKey correctKey = clientChannel.register(selector, SelectionKey.OP_WRITE, client);
+        client.handler.setKey(correctKey);
+        System.out.println((Client) key.attachment());
+        clientChannel.setOption(StandardSocketOptions.SO_LINGER, LINGER_TIME);
     }
 
     private void recvFromClient(SelectionKey key) throws IOException {
@@ -149,7 +148,7 @@ public class ClientConnection {
         listeningSocketChannel.bind(new InetSocketAddress(portNo));
         listeningSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
     }
-
+/*
     private void writeOperationForAllActiveClients() {
         for (SelectionKey key : selector.keys()) {
             if (key.channel() instanceof SocketChannel && key.isValid()) {
@@ -157,36 +156,13 @@ public class ClientConnection {
             }
         }
     }
-/*
-    private void appendMsgToClientQueue(SelectionKey key) {
-        synchronized (messagesToSend) {
-            ByteBuffer msgToSend;
-            while ((msgToSend = messagesToSend.poll()) != null) {
-                //for (SelectionKey key : selector.keys()) {
-                    Client client = (Client) key.attachment();
-                    if (client == null) {
-                        continue;
-                    }
-                    synchronized (client.messagesToSend) {
-                        client.queueMsgToSend(msgToSend);
-
-                    }
-                //}
-            }
-        }
-    }*/
-
+*/
     private class Client {
         private final ClientHandler handler;
         private final Queue<ByteBuffer> messagesToSend = new ArrayDeque<>();
-        //private final SelectionKey key;
 
-        private Client(ClientHandler handler, SelectionKey key) {
+        private Client(ClientHandler handler) {
             this.handler = handler;
-            //this.key = key;
-            /*for (String entry : conversation) {
-                messagesToSend.add(createBroadcastMessage(entry));
-            }*/
         }
 
         private void queueMsgToSend(ByteBuffer msg) {
@@ -204,11 +180,9 @@ public class ClientConnection {
                 }
             }
         }
-        
-       /* private void setToWrite(){
-            this.key.interestOps(SelectionKey.OP_WRITE);
-        }*/
     }
+    
+    
 
     /**
      * @param args Takes one command line argument, the number of the port on which the server will
