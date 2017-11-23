@@ -27,7 +27,7 @@ public class ClientController {
     private PrintWriter toServer;
     private BufferedReader fromServer;
     private volatile boolean connected;
-    private OutputHandler toOutput;
+    private OutputHandler toOutput = new OutputHandler();
     private ServerConnection serverConnect;
     //Connect to server
     public void connect(String ipAddress, int port)throws IOException {
@@ -41,28 +41,40 @@ public class ClientController {
         new Thread(new Listener()).start();
         toOutput = new OutputHandler();
         toServer.println("connect");  */
-        serverConnect = new ServerConnection();
+        serverConnect = new ServerConnection(this);
         serverConnect.connect(ipAddress, port);
+        //serverConnect.sendMsg("connect");
+        connected = true;
     }
     
     //Send start game command to server and ask for info to print
     public void startGame(){
-        /*if(connected){
-            toServer.println("start");
-            toServer.println("info");
+        if(connected){
+            serverConnect.sendMsg("start");
+            //serverConnect.sendMsg("info");
         }
         else{
             toOutput.printLn("Not connected, type connect <address> <port> to connect");
             toOutput.print("> ");
-        }*/
-        serverConnect.sendMsg("start a 127");
+        }
+    }
+    
+    public void getInfo(){
+        if(connected){
+            serverConnect.sendMsg("info");
+            //serverConnect.sendMsg("info");
+        }
+        else{
+            toOutput.printLn("Not connected, type connect <address> <port> to connect");
+            toOutput.print("> ");
+        }
     }
     
      //Send guess letter command to server and ask for info to print
     public void guessLetter(String letter){
         if(connected){
-            toServer.println("guess " + letter);
-            toServer.println("info");
+            serverConnect.sendMsg("guess " + letter);
+            serverConnect.sendMsg("info");
         }
         else{
             toOutput.printLn("Not connected, type connect <address> <port> to connect");
@@ -73,8 +85,8 @@ public class ClientController {
      //Send guess word command to server and ask for info to print
     public void guessWord(String word){
         if(connected){
-            toServer.println("guess " + word);
-            toServer.println("info");
+            serverConnect.sendMsg("guess " + word);
+            serverConnect.sendMsg("info");
         }
         else{
             toOutput.printLn("Not connected, type connect <address> <port> to connect");
@@ -85,9 +97,10 @@ public class ClientController {
      //Send disconnect command to server and shut down connection on client side
     public void disconnect() throws IOException{
         if(connected){
-            toServer.println("disconnect");
-            socket.close();
-            socket = null;
+            serverConnect.sendMsg("disconnect");;
+            /*socket.close();
+            socket = null;*/
+            serverConnect.disconnect();
             connected = false;
             toOutput.printLn("Disconnected");
             toOutput.print("> ");
@@ -99,7 +112,7 @@ public class ClientController {
     }
     
     //Send information to OutputHandler to be printed to user
-    private void sendToPrint(String input){
+    public void sendToPrint(String input){
         int i = input.indexOf(',');
         if(i < 0){
             toOutput.printLn(input);
@@ -144,7 +157,7 @@ public class ClientController {
     }
     
     //Listener subclass waits on message from server
-    private class Listener implements Runnable {
+  /*  private class Listener implements Runnable {
 
         @Override
         public void run() {
@@ -161,5 +174,5 @@ public class ClientController {
             }
         }
     
-    }
+    }*/
 }

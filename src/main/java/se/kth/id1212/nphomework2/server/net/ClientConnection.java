@@ -24,15 +24,15 @@ import se.kth.id1212.nphomework2.server.controller.ServerController;
  */
 public class ClientConnection {
     private static final int LINGER_TIME = 5000;
-    private static final int TIMEOUT_HALF_HOUR = 1800000;
-    private final ServerController contr = new ServerController();
+    //private static final int TIMEOUT_HALF_HOUR = 1800000;
+    //private final ServerController contr = new ServerController();
     //private final Queue<ByteBuffer> messagesToSend = new ArrayDeque<>();
     private final Queue<MsgAndKeyObject> messagesToSend = new ArrayDeque<>();
     private ByteBuffer messageToClient = ByteBuffer.allocateDirect(8152);
     private int portNo = 8080;
     private Selector selector;
     private ServerSocketChannel listeningSocketChannel;
-    private volatile boolean timeToBroadcast = false;
+   // private volatile boolean timeToBroadcast = false;
 
     /**
      * Sends the specified message to all connected clients
@@ -40,24 +40,15 @@ public class ClientConnection {
      * @param msg The message to broadcast.
      */
     void broadcast(String msg, SelectionKey key) {
-        //contr.appendEntry(msg);
-        //timeToBroadcast = true;
         ByteBuffer completeMsg = createBroadcastMessage(msg);
         MsgAndKeyObject putInQueue = new MsgAndKeyObject(completeMsg, key);
-        System.out.println("Message passed in to broadcast: " + msg + " key " + key);
         synchronized (messagesToSend) {
             messagesToSend.add(putInQueue);
         }
-        //messageToClient.put(completeMsg);
-        //handler.sendMsg(completeMsg);
         selector.wakeup();
     }
 
     private ByteBuffer createBroadcastMessage(String msg) {
-        /*StringJoiner joiner = new StringJoiner(Constants.MSG_TYPE_DELIMETER);
-        joiner.add(MsgType.BROADCAST.toString());
-        joiner.add(msg);
-        String messageWithLengthHeader = MessageSplitter.prependLengthHeader(joiner.toString());*/
         return ByteBuffer.wrap(msg.getBytes());
     }
 
@@ -69,7 +60,6 @@ public class ClientConnection {
                 synchronized (messagesToSend) {
                     MsgAndKeyObject queueObject;
                     while ((queueObject = messagesToSend.poll()) != null) {
-                        System.out.println("key " + queueObject.getKey());
                         Client client = (Client) queueObject.getKey().attachment();
                         client.queueMsgToSend(queueObject.getMessage());
                         queueObject.getKey().interestOps(SelectionKey.OP_WRITE);
@@ -79,8 +69,6 @@ public class ClientConnection {
                 Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                 while (iterator.hasNext()) {
                     SelectionKey key = iterator.next();
-                    Client client = (Client) key.attachment();
-                    System.out.println("key in iterator " + key + " client in iterator " + client);
                     iterator.remove();
                     if (!key.isValid()) {
                         continue;
@@ -182,8 +170,6 @@ public class ClientConnection {
         }
     }
     
-    
-
     /**
      * @param args Takes one command line argument, the number of the port on which the server will
      *             listen, the default is <code>8080</code>.

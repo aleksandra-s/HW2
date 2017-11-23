@@ -13,6 +13,8 @@ import java.util.StringJoiner;
 import java.util.concurrent.ForkJoinPool;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import se.kth.id1212.nphomework2.common.Commands.Command;
+import se.kth.id1212.nphomework2.server.controller.ServerController;
 /*import se.kth.id1212.nio.textprotocolchat.common.Constants;
 import se.kth.id1212.nio.textprotocolchat.common.MessageException;
 import se.kth.id1212.nio.textprotocolchat.common.MessageSplitter;
@@ -22,16 +24,18 @@ import se.kth.id1212.nio.textprotocolchat.common.MsgType;*/
  * Handles all communication with one particular chat client.
  */
 class ClientHandler implements Runnable {
-    private static final String JOIN_MESSAGE = " joined conversation.";
+    /*private static final String JOIN_MESSAGE = " joined conversation.";
     private static final String LEAVE_MESSAGE = " left conversation.";
-    private static final String USERNAME_DELIMETER = ": ";
+    private static final String USERNAME_DELIMETER = ": ";*/
 
     private final ClientConnection server;
     private final SocketChannel clientChannel;
     private final ByteBuffer msgFromClient = ByteBuffer.allocateDirect(8192);
+    private String clientCommand = "";
     //private final MessageSplitter msgSplitter = new MessageSplitter();
-    private String username = "anonymous";
+    //private String username = "anonymous";
     private SelectionKey clientKey;
+    private ServerController contr;
 
     /**
      * Creates a new instance, which will handle communication with one specific client connected to
@@ -43,6 +47,7 @@ class ClientHandler implements Runnable {
         this.server = server;
         this.clientChannel = clientChannel;
         //this.clientKey = key;
+        contr = new ServerController();
     }
     
     public void setKey(SelectionKey key){
@@ -54,44 +59,19 @@ class ClientHandler implements Runnable {
      */
     @Override
     public void run() {
-        /*while (msgSplitter.hasNext()) {
-            Message msg = new Message(msgSplitter.nextMsg());
-            switch (msg.msgType) {
-                case USER:
-                    username = msg.msgBody;
-                    server.broadcast(username + JOIN_MESSAGE);
-                    break;
-                case ENTRY:
-                    server.broadcast(username + USERNAME_DELIMETER + msg.msgBody);
-                    break;
-                case DISCONNECT:
-                    server.broadcast(username + LEAVE_MESSAGE);
-                    break;
-                default:
-                    throw new MessageException("Received corrupt message: " + msg.receivedString);
-            }
-        }*/
-        int i = 0;
-        if(i<1){
-            String message = "hello";
-            /*ByteBuffer buff = createBroadcastMessage(message);
-            try {
-                sendMsg(buff);
-            } catch (IOException ex) {
-                
-            }*/
-            server.broadcast(message,clientKey);
-            i++;
+        String returnString = contr.handleCommand(clientCommand); 
+        if(returnString != null){
+            server.broadcast(returnString, clientKey);
         }
     }
-    
+    /*
     private ByteBuffer createBroadcastMessage(String msg) {
         /*StringJoiner joiner = new StringJoiner(Constants.MSG_TYPE_DELIMETER);
         joiner.add(MsgType.BROADCAST.toString());
         joiner.add(msg);
         String messageWithLengthHeader = MessageSplitter.prependLengthHeader(joiner.toString());*/
-        return ByteBuffer.wrap(msg.getBytes());
-    }
+        //return ByteBuffer.wrap(msg.getBytes());
+    //}
 
     /**
      * Sends the specified message to the connected client.
@@ -100,11 +80,10 @@ class ClientHandler implements Runnable {
      * @throws IOException If failed to send message.
      */
     void sendMsg(ByteBuffer msg) throws IOException {
-      
         clientChannel.write(msg);
-        if (msg.hasRemaining()) {
+        /*if (msg.hasRemaining()) {
             //throw new MessageException("Could not send message");
-        }
+        }*/
     }
 
     /**
@@ -120,18 +99,9 @@ class ClientHandler implements Runnable {
         if (numOfReadBytes == -1) {
             throw new IOException("Client has closed connection.");
         }
-        String recvdString = extractMessageFromBuffer();
-        //msgSplitter.appendRecvdString(recvdString);
-        //System.out.println(recvdString);
+        clientCommand = extractMessageFromBuffer();
         ForkJoinPool.commonPool().execute(this);
-        System.out.println(recvdString);
-        /*String message = "hello";
-            ByteBuffer buff = createBroadcastMessage(message);
-            try {
-                sendMsg(buff);
-            } catch (IOException ex) {
-                
-       }*/
+        System.out.println(clientCommand);
     }
 
     private String extractMessageFromBuffer() {

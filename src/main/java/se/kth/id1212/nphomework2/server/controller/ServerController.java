@@ -13,9 +13,9 @@ import java.io.UncheckedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import se.kth.id1212.nphomework1.common.Commands;
-import se.kth.id1212.nphomework1.common.Commands.Command;
-import se.kth.id1212.nphomework1.server.model.Player;
+import se.kth.id1212.nphomework2.common.Commands;
+import se.kth.id1212.nphomework2.common.Commands.Command;
+import se.kth.id1212.nphomework2.server.model.Player;
 
 //***ServerController methods main, serve, and startHandler, and class ClientHandler based on Leif Lindback's code***
 
@@ -24,7 +24,97 @@ import se.kth.id1212.nphomework1.server.model.Player;
  * @author aleks_uuia3ly
  */
 public class ServerController {
-     private static final int LINGER_TIME = 5000;
+    private String command = "";
+    private String rest = "";
+    private Player player = new Player();
+    private boolean guessedCorrect = false;
+    
+    public String handleCommand(String clientCommand){
+        String inputFromClient = clientCommand;
+        int i = inputFromClient.indexOf(' ');
+                Command cmd;
+                
+                if(i < 0){
+                    if(inputFromClient.equals("disconnect")){
+                        cmd = Command.DISCONNECT;
+                    }
+                    else if(inputFromClient.equals("start")){
+                        cmd = Command.START_GAME;
+                    }
+                    else if(inputFromClient.equals("info")){
+                        cmd = Command.GET_INFO;
+                    }
+                    else if(inputFromClient.equals("connect")){
+                        cmd = Command.CONNECT;
+                    }
+                    else{
+                        cmd = Command.UNKNOWN;
+                    }
+                }
+                else{
+                    command = inputFromClient.substring(0,i);
+                    rest = inputFromClient.substring(i + 1);
+                    Commands commandClass = new Commands();
+                    cmd = commandClass.getEnumFromString(command,rest);
+                }
+                
+                switch (cmd) {
+                    case CONNECT:
+                        return("Connected");
+                        //break;
+                    case DISCONNECT:
+                        //server.removeClient();
+                        //return("Disconnected");
+                        return("Disconnected");
+                        //break;
+                    case START_GAME:
+                        player.getNewWord();
+                        break;
+                    case GUESS_LETTER:
+                        if(!player.checkStillPlaying()){
+                            return("Not playing");
+                            //break;
+                        }
+                        guessedCorrect = player.guessLetter(rest.charAt(0));
+                        break;
+                    case GUESS_WORD:
+                        if(!player.checkStillPlaying()){
+                            return("Not playing");
+                            //break;
+                        }
+                        guessedCorrect = player.guessWord(rest);
+                        break;
+                    case GET_INFO:
+                        if(player.checkStillPlaying()){ //still playing
+                            return("playing," + player.getWordToPrint() + "," + player.getAttemptsLeft());
+                        }
+                        else{
+                            if(guessedCorrect){
+                                return("won," + player.getWordToPrint() + "," + player.getScore());
+                            }
+                            else{
+                                return("lost," + player.getGuessWord() + "," + player.getScore());
+                            }
+                        }
+                        //break;
+                    case UNKNOWN:
+                        return("Invalid command sent to server");
+                        //break;
+                }
+                if(player.checkStillPlaying()){ //still playing
+                            return("playing," + player.getWordToPrint() + "," + player.getAttemptsLeft());
+                        }
+                        else{
+                            if(guessedCorrect){
+                                return("won," + player.getWordToPrint() + "," + player.getScore());
+                            }
+                            else{
+                                return("lost," + player.getGuessWord() + "," + player.getScore());
+                            }
+                        }
+                }
+    }
+    /* private static final int LINGER_TIME = 5000;
     private static final int TIMEOUT_HALF_HOUR = 1800000;
     private int portNo = 8080;
 
@@ -38,7 +128,7 @@ public class ServerController {
         server.serve();
     }
     */
-    private void serve() {
+    /*private void serve() {
         try {
             ServerSocket listeningSocket = new ServerSocket(portNo);
             while (true) {
@@ -76,7 +166,7 @@ public class ServerController {
      *
      * @param clientSocket The socket to which this handler's client is connected.
      */
-    ClientHandler(ServerController server, Socket clientSocket) {
+    /*ClientHandler(ServerController server, Socket clientSocket) {
         this.server = server;
         this.clientSocket = clientSocket;
         connected = true;
@@ -87,7 +177,7 @@ public class ServerController {
     /**
      * The run loop handling all communication with the connected client.
      */
-    @Override
+    /*@Override
     public void run() {
         try {
             boolean autoFlush = true;
@@ -188,8 +278,8 @@ public class ServerController {
         }
         connected = false;
     }
-  }
-}
+  }*/
+
 
 
 

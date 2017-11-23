@@ -22,6 +22,7 @@ import java.util.Queue;
 import java.util.StringJoiner;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
+import se.kth.id1212.nphomework2.client.controller.ClientController;
 /*import se.kth.id1212.nio.textprotocolchat.common.Constants;
 import se.kth.id1212.nio.textprotocolchat.common.MessageException;
 import se.kth.id1212.nio.textprotocolchat.common.MessageSplitter;
@@ -43,6 +44,11 @@ public class ServerConnection implements Runnable {
     private Selector selector;
     private boolean connected;
     private volatile boolean timeToSend = false;
+    private ClientController contr;
+    
+    public ServerConnection(ClientController contr){
+        this.contr = contr;
+    }
 
     /**
      * The communicating thread, all communication is non-blocking. First, server connection is
@@ -79,6 +85,7 @@ public class ServerConnection implements Runnable {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println(FATAL_COMMUNICATION_MSG);
         }
         try {
@@ -151,6 +158,7 @@ public class ServerConnection implements Runnable {
         }
         String recvdString = extractMessageFromBuffer();
         System.out.println("Received: " + recvdString);
+        contr.sendToPrint(recvdString);
         /*msgSplitter.appendRecvdString(recvdString);
         while (msgSplitter.hasNext()) {
             String msg = msgSplitter.nextMsg();

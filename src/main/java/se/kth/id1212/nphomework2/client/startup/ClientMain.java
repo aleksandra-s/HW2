@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package se.ktth.id1212.nphomework2.client.startup;
+package se.kth.id1212.nphomework2.client.startup;
 
 import se.kth.id1212.nphomework2.client.view.InputHandler;
 
