@@ -136,15 +136,7 @@ public class ClientConnection {
         listeningSocketChannel.bind(new InetSocketAddress(portNo));
         listeningSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
     }
-/*
-    private void writeOperationForAllActiveClients() {
-        for (SelectionKey key : selector.keys()) {
-            if (key.channel() instanceof SocketChannel && key.isValid()) {
-                key.interestOps(SelectionKey.OP_WRITE);
-            }
-        }
-    }
-*/
+
     private class Client {
         private final ClientHandler handler;
         private final Queue<ByteBuffer> messagesToSend = new ArrayDeque<>();

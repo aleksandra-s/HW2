@@ -15,13 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import se.kth.id1212.nphomework2.common.Commands.Command;
 import se.kth.id1212.nphomework2.server.controller.ServerController;
-/*import se.kth.id1212.nio.textprotocolchat.common.Constants;
-import se.kth.id1212.nio.textprotocolchat.common.MessageException;
-import se.kth.id1212.nio.textprotocolchat.common.MessageSplitter;
-import se.kth.id1212.nio.textprotocolchat.common.MsgType;*/
-
-/**
- * Handles all communication with one particular chat client.
+ /* Handles all communication with one particular chat client.
  */
 class ClientHandler implements Runnable {
     /*private static final String JOIN_MESSAGE = " joined conversation.";
@@ -64,14 +58,6 @@ class ClientHandler implements Runnable {
             server.broadcast(returnString, clientKey);
         }
     }
-    /*
-    private ByteBuffer createBroadcastMessage(String msg) {
-        /*StringJoiner joiner = new StringJoiner(Constants.MSG_TYPE_DELIMETER);
-        joiner.add(MsgType.BROADCAST.toString());
-        joiner.add(msg);
-        String messageWithLengthHeader = MessageSplitter.prependLengthHeader(joiner.toString());*/
-        //return ByteBuffer.wrap(msg.getBytes());
-    //}
 
     /**
      * Sends the specified message to the connected client.
@@ -118,32 +104,5 @@ class ClientHandler implements Runnable {
      */
     void disconnectClient() throws IOException {
         clientChannel.close();
-    }
-
-    private static class Message {
-        //private MsgType msgType;
-        private String msgBody;
-        private String receivedString;
-
-        private Message(String receivedString) {
-            //parse(receivedString);
-            this.receivedString = receivedString;
-        }
-/*
-        private void parse(String strToParse) {
-            try {
-                String[] msgTokens = strToParse.split(Constants.MSG_TYPE_DELIMETER);
-                msgType = MsgType.valueOf(msgTokens[Constants.MSG_TYPE_INDEX].toUpperCase());
-                if (hasBody(msgTokens)) {
-                    msgBody = msgTokens[Constants.MSG_BODY_INDEX].trim();
-                }
-            } catch (Throwable throwable) {
-                throw new MessageException(throwable);
-            }
-        }
-*/
-        private boolean hasBody(String[] msgTokens) {
-            return msgTokens.length > 1;
-        }
     }
 }

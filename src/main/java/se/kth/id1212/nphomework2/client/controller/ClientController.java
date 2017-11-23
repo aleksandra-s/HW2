@@ -7,10 +7,10 @@ package se.kth.id1212.nphomework2.client.controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+//import java.io.InputStreamReader;
 //import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.InetSocketAddress;
+//import java.net.InetSocketAddress;
 import java.net.Socket;
 import se.kth.id1212.nphomework2.client.view.OutputHandler;
 import se.kth.id1212.nphomework2.client.net.ServerConnection;
@@ -31,19 +31,8 @@ public class ClientController {
     private ServerConnection serverConnect;
     //Connect to server
     public void connect(String ipAddress, int port)throws IOException {
-        /*socket = new Socket();
-        socket.connect(new InetSocketAddress(ipAddress, port), TIMEOUT_HALF_MINUTE);
-        socket.setSoTimeout(TIMEOUT_HALF_HOUR);
-        connected = true;
-        boolean autoFlush = true;
-        toServer = new PrintWriter(socket.getOutputStream(), autoFlush);
-        fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        new Thread(new Listener()).start();
-        toOutput = new OutputHandler();
-        toServer.println("connect");  */
         serverConnect = new ServerConnection(this);
         serverConnect.connect(ipAddress, port);
-        //serverConnect.sendMsg("connect");
         connected = true;
     }
     
@@ -59,22 +48,12 @@ public class ClientController {
         }
     }
     
-    public void getInfo(){
-        if(connected){
-            serverConnect.sendMsg("info");
-            //serverConnect.sendMsg("info");
-        }
-        else{
-            toOutput.printLn("Not connected, type connect <address> <port> to connect");
-            toOutput.print("> ");
-        }
-    }
     
      //Send guess letter command to server and ask for info to print
     public void guessLetter(String letter){
         if(connected){
             serverConnect.sendMsg("guess " + letter);
-            serverConnect.sendMsg("info");
+            //serverConnect.sendMsg("info");
         }
         else{
             toOutput.printLn("Not connected, type connect <address> <port> to connect");
@@ -86,7 +65,7 @@ public class ClientController {
     public void guessWord(String word){
         if(connected){
             serverConnect.sendMsg("guess " + word);
-            serverConnect.sendMsg("info");
+            //serverConnect.sendMsg("info");
         }
         else{
             toOutput.printLn("Not connected, type connect <address> <port> to connect");
@@ -155,24 +134,4 @@ public class ClientController {
     public boolean checkConnected(){
         return connected;
     }
-    
-    //Listener subclass waits on message from server
-  /*  private class Listener implements Runnable {
-
-        @Override
-        public void run() {
-            try {
-                for (;;) {
-                    String input = fromServer.readLine();
-                    sendToPrint(input);
-                    
-                }
-            } catch (IOException connectionFailure) {
-                if (connected) {
-                    sendToPrint("Lost connection.");
-                }
-            }
-        }
-    
-    }*/
 }

@@ -23,10 +23,6 @@ import java.util.StringJoiner;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import se.kth.id1212.nphomework2.client.controller.ClientController;
-/*import se.kth.id1212.nio.textprotocolchat.common.Constants;
-import se.kth.id1212.nio.textprotocolchat.common.MessageException;
-import se.kth.id1212.nio.textprotocolchat.common.MessageSplitter;
-import se.kth.id1212.nio.textprotocolchat.common.MsgType;*/
 
 /**
  * Manages all communication with the server, all operations are non-blocking.
@@ -159,14 +155,6 @@ public class ServerConnection implements Runnable {
         String recvdString = extractMessageFromBuffer();
         System.out.println("Received: " + recvdString);
         contr.sendToPrint(recvdString);
-        /*msgSplitter.appendRecvdString(recvdString);
-        while (msgSplitter.hasNext()) {
-            String msg = msgSplitter.nextMsg();
-            if (MessageSplitter.typeOf(msg) != MsgType.BROADCAST) {
-                throw new MessageException("Received corrupt message: " + msg);
-            }
-            notifyMsgReceived(MessageSplitter.bodyOf(msg));
-        }*/
     }
     
      private String extractMessageFromBuffer() {
@@ -177,12 +165,6 @@ public class ServerConnection implements Runnable {
     }
      
      public void sendMsg(String message) {
-        /*StringJoiner joiner = new StringJoiner(Constants.MSG_TYPE_DELIMETER);
-        for (String part : parts) {
-            joiner.add(part);
-        }
-        String messageWithLengthHeader = MessageSplitter.prependLengthHeader(joiner.toString());*/
-        
         synchronized (messagesToSend) {
             messagesToSend.add(ByteBuffer.wrap(message.getBytes()));
         }
