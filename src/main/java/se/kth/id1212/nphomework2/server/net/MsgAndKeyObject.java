@@ -12,6 +12,8 @@ import java.nio.channels.SelectionKey;
  *
  * @author aleks_uuia3ly
  */
+
+//CLASS DESCRIPTION: Class I had to create to associate with a message to be sent with the receiving client so I could put it in the client's queue and set the client's key to Writeable
 public class MsgAndKeyObject {
     private final SelectionKey clientKey;
     private final ByteBuffer msgToSend;

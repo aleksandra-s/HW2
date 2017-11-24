@@ -15,24 +15,28 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.Queue;
-/*import java.util.StringJoiner;
-import se.kth.id1212.nphomework2.server.controller.ServerController;*/
 
 /**
- * Receives chat messages and broadcasts them to all chat clients. All communication to/from any
- * chat node passes this server.
+ * Receives messages from clients. All communication to/from any
+ * client passes this server.
  */
+
+/*
+HOW I SEND TO CLIENT (Numbers next to code lines as well):
+1)Broadcast called from ClientHandler and message to send and receiving client key is passed in
+2)Message is wrapped in bytes
+3)A MsgAndKeyObject is created from that and added to messagesToSend queue
+4)If the queue is not empty, in serve() method I take the key from the next MsgAndKeyObject in queue and add the msg to the Client attached to that key
+5)I also set that Client's key to Writeable
+6)Iterate through selector keys and send out messages in client queue if its key is Writeable
+*/
 public class ClientConnection {
     private static final int LINGER_TIME = 5000;
-    //private static final int TIMEOUT_HALF_HOUR = 1800000;
-    //private final ServerController contr = new ServerController();
-    //private final Queue<ByteBuffer> messagesToSend = new ArrayDeque<>();
     private final Queue<MsgAndKeyObject> messagesToSend = new ArrayDeque<>();
     private ByteBuffer messageToClient = ByteBuffer.allocateDirect(8152);
     private int portNo = 8080;
     private Selector selector;
     private ServerSocketChannel listeningSocketChannel;
-   // private volatile boolean timeToBroadcast = false;
 
     /**
      * Sends the specified message to all connected clients
@@ -40,10 +44,10 @@ public class ClientConnection {
      * @param msg The message to broadcast.
      */
     void broadcast(String msg, SelectionKey key) {
-        ByteBuffer completeMsg = createBroadcastMessage(msg);
+        ByteBuffer completeMsg = createBroadcastMessage(msg); //(2)
         MsgAndKeyObject putInQueue = new MsgAndKeyObject(completeMsg, key);
         synchronized (messagesToSend) {
-            messagesToSend.add(putInQueue);
+            messagesToSend.add(putInQueue); //(3)
         }
         selector.wakeup();
     }
@@ -59,10 +63,10 @@ public class ClientConnection {
             while (true) {
                 synchronized (messagesToSend) {
                     MsgAndKeyObject queueObject;
-                    while ((queueObject = messagesToSend.poll()) != null) {
+                    while ((queueObject = messagesToSend.poll()) != null) { //(4)
                         Client client = (Client) queueObject.getKey().attachment();
                         client.queueMsgToSend(queueObject.getMessage());
-                        queueObject.getKey().interestOps(SelectionKey.OP_WRITE);
+                        queueObject.getKey().interestOps(SelectionKey.OP_WRITE); //(5)
                     }
                 }
                 selector.select();
@@ -78,12 +82,11 @@ public class ClientConnection {
                     } else if (key.isReadable()) {
                         recvFromClient(key);
                     }else if (key.isWritable()) {
-                        sendToClient(key);
+                        sendToClient(key); //(6)
                     }
                 }
             }
         } catch (Exception e) {
-            //e.printStackTrace();
             System.err.println("Server failure.");
         }
     }
@@ -114,7 +117,6 @@ public class ClientConnection {
         try {
             client.sendAll();
             key.interestOps(SelectionKey.OP_READ);
-        //} catch (MessageException couldNotSendAllMessages) {
         } catch (IOException clientHasClosedConnection) {
             removeClient(key);
         }

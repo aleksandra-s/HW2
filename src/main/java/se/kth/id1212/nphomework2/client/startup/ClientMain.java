@@ -11,7 +11,7 @@ import se.kth.id1212.nphomework2.client.view.InputHandler;
  *
  * @author aleks_uuia3ly
  */
-//Run client
+//CLASS DESCRIPTION: Run client
 public class ClientMain {
     public static void main(String[] args) {
         new InputHandler().start();

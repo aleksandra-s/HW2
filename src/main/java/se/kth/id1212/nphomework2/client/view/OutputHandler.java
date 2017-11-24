@@ -9,6 +9,8 @@ package se.kth.id1212.nphomework2.client.view;
  *
  * @author aleks_uuia3ly
  */
+//CLASS DESCRIPTION: Methods for printing to user
+
 public class OutputHandler{
 
     public void printWord(String word){

@@ -9,27 +9,16 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-//import java.util.StringJoiner;
 import java.util.concurrent.ForkJoinPool;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-/*import java.util.logging.Level;
-import java.util.logging.Logger;
-import se.kth.id1212.nphomework2.common.Commands.Command;*/
 import se.kth.id1212.nphomework2.server.controller.ServerController;
  /* Handles all communication with one particular chat client.
  */
 class ClientHandler implements Runnable {
-    /*private static final String JOIN_MESSAGE = " joined conversation.";
-    private static final String LEAVE_MESSAGE = " left conversation.";
-    private static final String USERNAME_DELIMETER = ": ";*/
 
     private final ClientConnection server;
     private final SocketChannel clientChannel;
     private final ByteBuffer msgFromClient = ByteBuffer.allocateDirect(8192);
     private String clientCommand = "";
-    //private final MessageSplitter msgSplitter = new MessageSplitter();
-    //private String username = "anonymous";
     private SelectionKey clientKey;
     private ServerController contr;
 
@@ -65,7 +54,7 @@ class ClientHandler implements Runnable {
                 }
             }
             else{
-                server.broadcast(returnString, clientKey);
+                server.broadcast(returnString, clientKey); //(1)
             }
         }
     }
@@ -78,9 +67,6 @@ class ClientHandler implements Runnable {
      */
     void sendMsg(ByteBuffer msg) throws IOException {
         clientChannel.write(msg);
-        /*if (msg.hasRemaining()) {
-            //throw new MessageException("Could not send message");
-        }*/
     }
 
     /**

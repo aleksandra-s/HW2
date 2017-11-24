@@ -13,6 +13,9 @@ import se.kth.id1212.nphomework2.common.Commands.Command;
  *
  * @author aleks_uuia3ly
  */
+
+//CLASS DESCRIPTION: Takes in user input from console, parses it, and calls corresponding method in ClientController
+
 public class InputHandler implements Runnable{
 
     private boolean receivingCmds = false;
@@ -21,7 +24,7 @@ public class InputHandler implements Runnable{
     String rest;
     ClientController clientController;
     
-    //Start thread for run method
+    //START THREAD FOR RUN METHOD
     public void start(){
         if(receivingCmds){
             return;
@@ -31,7 +34,7 @@ public class InputHandler implements Runnable{
         clientController = new ClientController();
     }
     
-    //run method processes input from user
+    //RUN METHOD PROCESSES INPUT FROM USER
     @Override
     public void run(){  
         System.out.println("Welcome to Hangman. Type 'connect <address> 8080' to connect, then 'start' to start playing");
@@ -75,7 +78,6 @@ public class InputHandler implements Runnable{
                         if(clientController.checkConnected()){
                             System.out.println("Starting game- type 'guess' followed by a letter or word");
                             clientController.startGame();
-                            //clientController.getInfo();
                             System.out.print("> ");
                         }
                         else{
@@ -118,7 +120,7 @@ public class InputHandler implements Runnable{
         }
     }
     
-    //Determine Command based on input from user
+    //DETERMINE ENUM COMMAND BASED ON INPUT FROM USER
     private Command getCommand(String command, String rest){
         Command returnCommand;
         if(command.equals("connect")){

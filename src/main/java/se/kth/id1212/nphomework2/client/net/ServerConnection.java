@@ -16,16 +16,11 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayDeque;
-//import java.util.ArrayList;
-//import java.util.List;
 import java.util.Queue;
-/*import java.util.StringJoiner;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;*/
 import se.kth.id1212.nphomework2.client.controller.ClientController;
 
 /**
- * Manages all communication with the server, all operations are non-blocking.
+ * CLASS DESCRIPTION: Manages all communication with the server, all operations are non-blocking.
  */
 public class ServerConnection implements Runnable {
     private static final String FATAL_COMMUNICATION_MSG = "Lost connection.";
@@ -33,8 +28,6 @@ public class ServerConnection implements Runnable {
 
     private final ByteBuffer msgFromServer = ByteBuffer.allocateDirect(8192); //Max message length 8192
     private final Queue<ByteBuffer> messagesToSend = new ArrayDeque<>();
-    //private final MessageSplitter msgSplitter = new MessageSplitter();
-    //private final List<CommunicationListener> listeners = new ArrayList<>();
     private InetSocketAddress serverAddress;
     private SocketChannel socketChannel;
     private Selector selector;
@@ -62,7 +55,7 @@ public class ServerConnection implements Runnable {
                     socketChannel.keyFor(selector).interestOps(SelectionKey.OP_WRITE);
                     timeToSend = false;
                 }
-
+                //Run through selector keys and based on whether they are Connectable, Readable, or Writable execute corresponding operation
                 selector.select();
                 for (SelectionKey key : selector.selectedKeys()) {
                     selector.selectedKeys().remove(key);
@@ -72,16 +65,13 @@ public class ServerConnection implements Runnable {
                     if (key.isConnectable()) {
                         completeConnection(key);
                     } else if (key.isReadable()) {
-                        System.out.println("receiving from server");
                         recvFromServer(key);
                     } else if (key.isWritable()) {
-                        System.out.println("sending to server");
                         sendToServer(key);
                     }
                 }
             }
         } catch (Exception e) {
-            //e.printStackTrace();
             System.err.println(FATAL_COMMUNICATION_MSG);
         }
         try {
@@ -98,14 +88,11 @@ public class ServerConnection implements Runnable {
     
      public void disconnect() throws IOException {
         connected = false;
-        //sendMsg(MsgType.DISCONNECT.toString(), null);
-        //IMPLEMENT OWN SENDMSG METHOD TO SEND STUFF TO SERVER
     }
     
     private void doDisconnect() throws IOException {
         socketChannel.close();
         socketChannel.keyFor(selector).cancel();
-        //notifyDisconnectionDone();
     }
     
      private void initSelector() throws IOException {
@@ -120,6 +107,7 @@ public class ServerConnection implements Runnable {
         connected = true;
     }
     
+    //AS LONG AS THERE ARE MESSAGES IN QUEUE, SEND THEM TO SERVER, THEN SET KEY TO READABLE
     private void sendToServer(SelectionKey key) throws IOException {
         ByteBuffer msg;
         synchronized (messagesToSend) {
@@ -130,7 +118,6 @@ public class ServerConnection implements Runnable {
                 }
                 messagesToSend.remove();
             }
-            System.out.println("Key to read");
             key.interestOps(SelectionKey.OP_READ);
         }
     }
@@ -138,14 +125,9 @@ public class ServerConnection implements Runnable {
     private void completeConnection(SelectionKey key) throws IOException {
         socketChannel.finishConnect();
         key.interestOps(SelectionKey.OP_READ);
-        /*try {
-            InetSocketAddress remoteAddress = (InetSocketAddress) socketChannel.getRemoteAddress();
-                //notifyConnectionDone(remoteAddress);
-        } catch (IOException couldNotGetRemAddrUsingDefaultInstead) {
-                //notifyConnectionDone(serverAddress);
-        }*/
     }
     
+    //RECEIVE MESSAGE FROM SERVER AND SEND TO CONTROLLER TO BE HANDLED AND PRINTED TO USER
     private void recvFromServer(SelectionKey key) throws IOException {
         msgFromServer.clear();
         int numOfReadBytes = socketChannel.read(msgFromServer);
@@ -153,18 +135,19 @@ public class ServerConnection implements Runnable {
             throw new IOException(FATAL_COMMUNICATION_MSG);
         }
         String recvdString = extractMessageFromBuffer();
-        System.out.println("Received: " + recvdString);
         contr.sendToPrint(recvdString);
     }
     
-     private String extractMessageFromBuffer() {
+    //EXTRACT BYTE MESSAGE AND CONVERT INTO STRING
+    private String extractMessageFromBuffer() {
         msgFromServer.flip();
         byte[] bytes = new byte[msgFromServer.remaining()];
         msgFromServer.get(bytes);
         return new String(bytes);
     }
-     
-     public void sendMsg(String message) {
+    
+    //WRAPS STRING MESSAGE AS BYTES AND ADDS TO QUEUE
+    public void sendMsg(String message) {
         synchronized (messagesToSend) {
             messagesToSend.add(ByteBuffer.wrap(message.getBytes()));
         }

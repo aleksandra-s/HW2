@@ -9,6 +9,8 @@ package se.kth.id1212.nphomework2.common;
  *
  * @author aleks_uuia3ly
  */
+//CLASS DESCRIPTION: Contains common enum Command and parsing method 
+
 public class Commands {
     public enum Command{
         CONNECT,

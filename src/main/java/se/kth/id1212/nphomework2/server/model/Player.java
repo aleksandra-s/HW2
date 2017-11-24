@@ -6,15 +6,13 @@
 package se.kth.id1212.nphomework2.server.model;
 
 import java.io.IOException;
-/*import java.util.logging.Level;
-import java.util.logging.Logger;
-import se.kth.id1212.nphomework1.server.ServerController;
-import se.kth.id1212.nphomework1.server.ServerController.ClientHandler;*/
 
 /**
  *
  * @author aleks_uuia3ly
  */
+//CLASS DEESCRIPTION: Runs the game and holds all data for corresponding client (word to guess, score, attempts left, etc.)
+
 public class Player {
     private int score;
     private int attemptsLeft;
@@ -30,13 +28,15 @@ public class Player {
         this.stillPlaying = false;
     }
     
-    //Start new game
+    //START NEW GAME
     public String getNewWord(){
         String returnWord;
         try {
+            //Get new word using WordRetrieve class
             returnWord = new se.kth.id1212.nphomework2.server.model.WordRetrieve().chooseWordFromFile();
             System.out.println("returned: " + returnWord);
             this.wordToGuess = returnWord;
+            //Create a masked version of the word to print to user
             StringBuilder buildMask = new StringBuilder();
             for(int i = 0; i < returnWord.length(); i++){
                 buildMask.append("_ ");
@@ -47,7 +47,7 @@ public class Player {
             return wordToGuess;
         } catch (IOException ex) {
             System.out.println("Unable to get word");
-            ex.printStackTrace();
+            //ex.printStackTrace();
             return null;
         }
         
@@ -118,6 +118,7 @@ public class Player {
         return this.wordToGuess;
     }
     
+    //Update masked version of the word
     private void updateWordToPrint(int index, char replacement){
         StringBuilder updatePrint = new StringBuilder(this.wordToPrint);
         for(int i = 0; i < updatePrint.length(); i++){
