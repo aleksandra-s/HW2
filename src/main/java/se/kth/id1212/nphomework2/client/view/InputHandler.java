@@ -72,16 +72,16 @@ public class InputHandler implements Runnable{
                         clientController.disconnect();
                         break;
                     case START_GAME:
-                        //if(clientController.checkConnected()){
+                        if(clientController.checkConnected()){
                             System.out.println("Starting game- type 'guess' followed by a letter or word");
                             clientController.startGame();
                             //clientController.getInfo();
                             System.out.print("> ");
-                        //}
-                        /*else{
+                        }
+                        else{
                             System.out.println("Not connected");
                             System.out.print("> ");
-                        }*/
+                        }
                         break;
                     case GUESS_LETTER:
                         if(clientController.checkConnected()){

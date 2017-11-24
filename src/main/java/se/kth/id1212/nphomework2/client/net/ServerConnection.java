@@ -16,12 +16,12 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
 import java.util.Queue;
-import java.util.StringJoiner;
+/*import java.util.StringJoiner;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinPool;*/
 import se.kth.id1212.nphomework2.client.controller.ClientController;
 
 /**
@@ -81,7 +81,7 @@ public class ServerConnection implements Runnable {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             System.err.println(FATAL_COMMUNICATION_MSG);
         }
         try {
@@ -138,12 +138,12 @@ public class ServerConnection implements Runnable {
     private void completeConnection(SelectionKey key) throws IOException {
         socketChannel.finishConnect();
         key.interestOps(SelectionKey.OP_READ);
-        try {
+        /*try {
             InetSocketAddress remoteAddress = (InetSocketAddress) socketChannel.getRemoteAddress();
                 //notifyConnectionDone(remoteAddress);
         } catch (IOException couldNotGetRemAddrUsingDefaultInstead) {
                 //notifyConnectionDone(serverAddress);
-        }
+        }*/
     }
     
     private void recvFromServer(SelectionKey key) throws IOException {

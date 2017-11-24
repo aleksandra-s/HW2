@@ -20,12 +20,12 @@ import se.kth.id1212.nphomework2.client.net.ServerConnection;
  * @author aleks_uuia3ly
  */
 public class ClientController {
-    
+    /*
     private static final int TIMEOUT_HALF_HOUR = 1800000;
     private static final int TIMEOUT_HALF_MINUTE = 30000;
     private Socket socket;
     private PrintWriter toServer;
-    private BufferedReader fromServer;
+    private BufferedReader fromServer;*/
     private volatile boolean connected;
     private OutputHandler toOutput = new OutputHandler();
     private ServerConnection serverConnect;
@@ -76,7 +76,7 @@ public class ClientController {
      //Send disconnect command to server and shut down connection on client side
     public void disconnect() throws IOException{
         if(connected){
-            serverConnect.sendMsg("disconnect");;
+            serverConnect.sendMsg("disconnect");
             /*socket.close();
             socket = null;*/
             serverConnect.disconnect();

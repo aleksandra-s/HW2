@@ -9,11 +9,13 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.StringJoiner;
+//import java.util.StringJoiner;
 import java.util.concurrent.ForkJoinPool;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import se.kth.id1212.nphomework2.common.Commands.Command;
+/*import java.util.logging.Level;
+import java.util.logging.Logger;
+import se.kth.id1212.nphomework2.common.Commands.Command;*/
 import se.kth.id1212.nphomework2.server.controller.ServerController;
  /* Handles all communication with one particular chat client.
  */
@@ -55,7 +57,16 @@ class ClientHandler implements Runnable {
     public void run() {
         String returnString = contr.handleCommand(clientCommand); 
         if(returnString != null){
-            server.broadcast(returnString, clientKey);
+            if(returnString.equals("Disconnected")){
+                try {
+                    disconnectClient();
+                } catch (IOException ex) {
+                    server.broadcast("Couldn't disconnect", clientKey);
+                }
+            }
+            else{
+                server.broadcast(returnString, clientKey);
+            }
         }
     }
 

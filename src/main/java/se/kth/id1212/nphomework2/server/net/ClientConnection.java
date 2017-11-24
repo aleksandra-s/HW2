@@ -15,8 +15,8 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.Queue;
-import java.util.StringJoiner;
-import se.kth.id1212.nphomework2.server.controller.ServerController;
+/*import java.util.StringJoiner;
+import se.kth.id1212.nphomework2.server.controller.ServerController;*/
 
 /**
  * Receives chat messages and broadcasts them to all chat clients. All communication to/from any
@@ -83,7 +83,7 @@ public class ClientConnection {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             System.err.println("Server failure.");
         }
     }
